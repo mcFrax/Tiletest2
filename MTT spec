@@ -24,7 +24,7 @@ słowa kluczowe:
 	
 		segsize ##
 	
-	## żądany segsize
+	## żądany segsize. Musi być potęgą 2.
 	
 [*]	segment
 	Użycie:

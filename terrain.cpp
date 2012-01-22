@@ -3,6 +3,64 @@
 
 //~ #define TER_LINELOG	//Wypisywanie czytanych linii
 
+
+void Segment::draw( const CamInfo& camInfo )
+{
+	throw LogicError("Incomplete");
+}
+
+void Segment::tempDraw( const CamInfo& camInfo )
+{
+    if (displayLists){
+        GLTERRORCHECK;
+	    tex.safeBind();
+        glCallList(displayLists+lod(camInfo));
+        GLTERRORCHECK;
+    }
+}
+
+void Segment::createDisplayLists( Point2f* texCoordArray )
+{
+    if (displayLists) return;
+    GLTERRORCHECK;
+    displayLists = glGenLists(size2+1);
+    if (!displayLists) throw RuntimeError("glGenLists failed");
+
+    GLTERRORCHECK;
+
+    LOG(("Creating display lists\n"));
+    for (int i = 0; i <= size2; ++i ){
+        int off = i+1;
+        glNewList(displayLists+i, GL_COMPILE);
+        GLTERRORCHECK;
+        {
+            glMatrixMode( GL_TEXTURE );
+            glLoadIdentity();
+            glTranslatef( -tex.x1(), -tex.y1(), 0.0f );
+            glScalef( tex.x2()-tex.x1(), tex.y2()-tex.y1(), 1.0f );
+
+            for ( int iy = 0; iy < H; iy+=off ){
+                glBegin( GL_TRIANGLE_STRIP );
+                for ( int ix = 0; ix <= W; ix+=off ){
+                    int i1 = iy*(size+1)+ix;
+                    int i2 = (iy+off)*(size+1)+ix;
+                    glTexCoord2fv( texCoordArray[i1] );
+                    glNormal3fv( normalArray[i1] );
+                    glVertex3fv( vertexArray[i1] );
+                    glTexCoord2fv( texCoordArray[i2] );
+                    glNormal3fv( normalArray[i2] );
+                    glVertex3fv( vertexArray[i2] );
+                }
+                glEnd();
+            }
+        }
+        glEndList();
+        GLTERRORCHECK;
+    }
+    vertexArray.reset();
+    normalArray.reset();
+}
+
 static inline void readFileName( const char * path, int l, std::istream & is, std::string& s )
 {
 	try
@@ -65,9 +123,9 @@ void Terrain::rSsize( const char * path, int l, std::istream &is )
 		throw std::runtime_error( std::string( "Segsize redefined" ) );
 	}
 	is >> seg.size;
-	if ( seg.size == 0 ){
-		fprintf( stderr, "%s:%i: Error: Segsize = 0\n", path, l );
-		throw std::runtime_error( std::string( "Segsize = 0" ) );
+	if ( __builtin_popcount(seg.size) != 1 ){
+		fprintf( stderr, "%s:%i: Error: Segsize is not a power of 2\n", path, l );
+		throw std::runtime_error( std::string( "Segsize is not a power of 2" ) );
 	}
     LOG(("MTT: Segsize %u\n", seg.size));
 	if ( hmap ){
@@ -220,11 +278,14 @@ void Terrain::makeSegments()
 	seg.segments = new Segment [seg.W*seg.H];
     LOG(("Terrain: %i segments created\n", seg.H*seg.W));
 	
+	Segment::indices = indices;
+
 	for ( int ix = 0; ix < seg.W; ix++ ){
 		for ( int iy = 0; iy < seg.H; iy++ ){
 			seg( ix, iy ).set( seg.size, ix == seg.W-1 ? wb : seg.size, iy == seg.H-1 ? hb : seg.size );
 			seg( ix, iy ).tex = seg.map.find( std::make_pair( ix, iy ) ) == seg.map.end() ? texMap[ deftex ] : texMap[ seg.map[ std::make_pair( ix, iy ) ] ];
 			make( seg( ix, iy ), ix*seg.size, iy*seg.size );
+            seg( ix, iy ).createDisplayLists(seg.texCoordArray);
 		}
 	}
 	
@@ -450,12 +511,12 @@ void Terrain::draw( const CamInfo& camInfo, const bool correctCamPos )
 
 #endif
 
-void Terrain::tempDraw()
+void Terrain::tempDraw( const CamInfo& camInfo, const bool correctCamPos )
 {
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
+	//~ glEnableClientState(GL_VERTEX_ARRAY);
+	//~ glEnableClientState(GL_NORMAL_ARRAY);
+	//~ glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//~ glDisableClientState(GL_COLOR_ARRAY);
 	
 	glCullFace( GL_FRONT );
 	glEnable( GL_CULL_FACE );
@@ -471,19 +532,22 @@ void Terrain::tempDraw()
 	glActiveTexture( GL_TEXTURE0 );
 	glEnable(GL_TEXTURE_2D);
 	
-	Segment::indices = indices;
 	
-	glTexCoordPointer( 2, GL_FLOAT, 0, seg.texCoordArray );
+    GLTERRORCHECK;
+
+	//~ glTexCoordPointer( 2, GL_FLOAT, 0, seg.texCoordArray );
 	for ( int ix = 0; ix < seg.W; ix++ )
 		for ( int iy = 0; iy < seg.H; iy++ ){
-			seg( ix, iy ).tempDraw();
+			seg( ix, iy ).tempDraw(camInfo);
 		}
+
+    GLTERRORCHECK;
 		
 	glMatrixMode( GL_TEXTURE );
 	glLoadIdentity();
 }
 
-Segment::Segment() : size( 0 ), W( 0 ), H( 0 )
+Segment::Segment() : displayLists(0), size( 0 ), W( 0 ), H( 0 )
 {
 }
 

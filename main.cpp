@@ -61,7 +61,7 @@ void Scene::onDraw()
 	
 	setLightPos();
 	
-	terrain.tempDraw();
+	terrain.tempDraw(cam);
 	
 	//~ glFinish();
 	

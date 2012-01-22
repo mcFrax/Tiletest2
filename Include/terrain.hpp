@@ -1,18 +1,11 @@
 #ifndef _TERRAIN_HPP_
 #define _TERRAIN_HPP_
 
-#include <algorithm>
-#include <exception>
-#include <stdexcept>
-#include <memory>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cstdio>
-#include <cctype>
 #include <cmath>
-#include <vector>
-#include <map>
 
 #include "const.hpp"
 #include "texture.hpp"
@@ -26,18 +19,23 @@
 
 struct Segment
 {
+        uint displayLists;
 		static uint16_t * indices;
 		auto_array_ptr<Point3f> vertexArray;
 		auto_array_ptr<Point3f> normalArray;
 		Point2f * texCoordArray;
 		Texture tex;	//!< Tekstura segmentu
 		int size;		//!< Wielkość segmentu, tj. rozmiar tablic.
+        int size2;      //!< log_2 size
 		int W;			//!< Szerokość segmentu, tj. szerokość faktycznej zawartości (==size, jeżeli pełny segment).
 		int H;			//!< Wysokość segmentu, tj. wysokość faktycznej zawartości (==size, jeżeli pełny segment).
 		Segment();
-		void set( int s, int w, int h ) { size = s; W = w; H = h; }
+		void set( int s, int w, int h ) { size = s; size2 =__builtin_ctz(size); W = w; H = h; }
 		void draw( const CamInfo& camInfo );
-		void tempDraw();
+		void tempDraw( const CamInfo& camInfo );
+        void createDisplayLists( Point2f* texCoordArray );
+        int lod( const CamInfo& camInfo ) { return size2; }
+
 };
 
 class Terrain
@@ -75,35 +73,7 @@ class Terrain
 		Terrain( const char * path );
 		void loadFromMTT( const char * path );
 		void draw( const CamInfo& camInfo, const bool correctCamPos = 1 );
-		void tempDraw();
+		void tempDraw( const CamInfo& camInfo, const bool correctCamPos = 1 );
 };
-
-
-inline void Segment::draw( const CamInfo& camInfo )
-{
-	tempDraw();
-}
-
-inline void Segment::tempDraw()
-{
-	glMatrixMode( GL_TEXTURE );
-	glLoadIdentity();
-	glTranslatef( -tex.x1(), -tex.y1(), 0.0f );
-	glScalef( tex.x2()-tex.x1(), tex.y2()-tex.y1(), 1.0f );
-	
-	tex.safeBind();
-	
-	glVertexPointer( 3, GL_FLOAT, 0, vertexArray );
-	glNormalPointer( GL_FLOAT, 0, normalArray );
-	
-	for ( int iy = 0; iy < H; iy++ ){
-		for ( int ix = 0; ix <= W; ix++ ){
-			indices[2*ix] = iy*(size+1)+ix;
-			indices[2*ix+1] = (iy+1)*(size+1)+ix;
-		}
-		
-		glDrawRangeElements( GL_TRIANGLE_STRIP, iy*(size+1), (iy+1)*(size+1)+W, 2*W+2, GL_UNSIGNED_SHORT, indices );
-	}
-}
 
 #endif //_TERRAIN_HPP_
