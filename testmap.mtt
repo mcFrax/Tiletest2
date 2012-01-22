@@ -1,0 +1,12 @@
+MTTtext 0.1
+
+#testowy plik MTTtext
+
+HeightMap "map.png"
+
+segsize 16
+
+texture 0 f "mapbitmap1024.jpg"
+texture 1 t 0 0 0 4096 4096
+
+deftex 1

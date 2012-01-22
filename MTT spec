@@ -1,0 +1,63 @@
+MTT text map file - specyfikacja formatu
+
+Plik tekstowy, zawierający informacje potrzebne do załadowania mapy z innych plików.
+Zaczyna się zawsze linią:
+
+	MTTtext <v>
+
+gdzie <v> jest wersją zapisu
+W tej linii nie powinien występować komentarz.
+
+Uwaga! Wszystkie nazwy plików _muszą_ być podane w cudzysłowie "".
+Komentarze pisane są po hashu. Po znaku # ignorowane są wszystkie znaki do końca linii.
+
+słowa kluczowe:
+
+[*]	heightmap - podaje ścieżkę mapy wysokości
+	Użycie:
+		heightmap <path>
+		
+	<path> jest ścieżką grayscale'owej bitmapy. Wielkość bitmapy -1 jest wielkością mapy.
+	
+[*]	segsize - podaje użyty segsize
+	Użycie:
+	
+		segsize ##
+	
+	## żądany segsize
+	
+[*]	segment
+	Użycie:
+	
+		segment <x> <y> <tex> 
+		
+	<x>, <y> - współrzędne segmentu, <tex> - id tekstury
+	
+[*]	deftex - tekstura dla niezdeklarowanych segmentów
+	Użycie:
+	
+		deftex <tex>
+	
+	<tex> - id tekstury
+	Domyślnie 0.
+	
+[*]	texture - deklaracja tekstury
+	Użycie:
+	
+		texture ## f <path>
+		texture ## t <source> <offx> <offy> <w> <h>
+		
+	Objaśnienie:
+	
+	1.
+		texture ## f <path>
+		
+	## jest identyfikatorem(liczba), a <path> jest ścieżką obrazka
+	
+	2.
+		texture ## t <source> <offx> <offy> <w> <h>
+		
+	## jest identyfikatorem(liczba), <source> identyfikatorem tekstury źródłowej, <offx> i <offy> przesunięciam, a <w>, <h> rozmiarami, jak w Texture::rect().
+	
+	Tworzenie mapy tekstur jest jednoprzebiegowe, czyli tekstura źródłowa musi być załadowana jako pierwsza.
+	

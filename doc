@@ -1,0 +1,12 @@
+
+/*!
+ * \file console.hpp
+ * \brief Implementacja klasy console
+ */
+
+/*!
+ * \class console
+ * \brief Prosta implementacja konsoli używającej SDL i OpenGl.
+ * 
+ * Prosta implementacja konsoli używającej do rysowania SDLFontRenderer. Dla pełnego działania w trakcie rysowania ramki muszą być wywołane dwie funkcje - makeTex() i draw(), przy czym pierwsza musi być wywołana przed renderowaniem sceny, ponieważ czyści bufor i zmienia Viewport. Metody w tej klasie są dość niespójne i raczej nie radzę próbować zrozumieć, o co chodzi. I tak ją przepiszę pewnie od nowa, więc to generalnie bez znaczenia.
+ */

@@ -1,0 +1,34 @@
+Koncepcja specyfikacji pliku mapy - możecie dopisać swoje sugestie
+
+offset	size	content
+0	8	BSGraMAP - identyfikator
+8	4	wersja standardu mapy ( na razie 0 )
+12	4	offset mapy wysokości
+16	4	offset informacji o bitmapach
+20	4	offset mapy terenu
+24	4	offset mapy obiektów
+28	4	zarezerwowane	(pole na ew. dodatkowe offsety, np. kontenera wydarzeń etc.)
+32	4	zarezerwowane	(pole na ew. dodatkowe offsety, np. kontenera wydarzeń etc.)
+36	4	szerokość mapy	(informacyjnie; faktyczna szerokość zależy od mapy wysokości)
+40	4	wysokość mapy	(informacyjnie; faktyczna wysokość zależy od mapy wysokości)
+44	4	szerokość tekstury segmentu teksturowania
+48	4	szerokość segmentu teksturowania
+52	4	seed dla generatora elementów losowych
+56	4	zarezerwowane
+60	4	zarezerwowane
+64	4	zarezerwowane
+68	4	zarezerwowane
+72	-	nazwa (NULL-terminated string)
+vary	-	opis (NULL-terminated string)
+vary	-	dalsze dane - zgodnie z offsetami
+(mapa wysokości)
+(bitmap info) :
+	ilość bitmap do załadowania z tego pliku
+	offset pierwszej bitmapy w tym pliku
+	ilość bitmap poza tym plikiem
+	ścieżki wszystkich bitmap ładowanych z dysku
+	... (NULL-terminated strings)
+	bitmapy zapisane w pliku
+(mapa terenu) (generalnie wszystkie dane o polach jako takich: rodzaj terenu, zasoby etc.)
+(mapa obiektów)
+

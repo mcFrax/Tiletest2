@@ -1,0 +1,12 @@
+Wszystkie controlsy widoczne w konsoli po wciśnięciu 'h'. ( Tylko w wersji z GLUT )
+
+Pierwszy argument przekazany do programu jest traktowany jako nazwa mapy wysokości, drugi jako tekstura ( oba opcjonalne; domyślnie używa map.png i mapbitmap1024.png )
+
+Blokada obrotu kamery w dół wynika z niepełnej implementacji rysowania - zapobiega widoczności dziur w terenie
+
+Klasa Texture jest wstępną wersją klasy dostępu do tekstur. Na ten moment zakładam usunięcie listy tekstur z CGraphics i udostępnienie tekstur przez tę klasę. Do zaimplementowania są metody rysujące, ew. coś jeszcze.
+
+Część klas ma gotową dokumentację. Wystarczy odpalić Doxygena w tym folderze.
+
+W katalogu Test jest programik test1 (kompilowany przez make), testujący szybkość wczytywania tekstur. Po podaniu ścieżki w czterech pięciosekundowych cyklach na okrągło wczytuje podaną teksturę, na zmianę z generowaniem mipmap i bez, i podaje statystyki. Ze względów czasowych nie wypisuje żadnych dodatkowych logów. Uwzględniając czasy wczytywania stwierdzam, że jeżeli chcemy dynamicznie wczytywać tekstury terenu, to muszą być w bmp'ach. Mogą być paletowane (to już działa) i być może skompresowane RLE (jeżeli to zaimplementuję, to nie powinien być problem w sumie; 5 linijek na krzyż).
+
