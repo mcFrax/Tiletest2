@@ -25,29 +25,33 @@ void Terrain::make( TerrainSegment & s, int x, int y )
 {
     static const int d[5][2] = { {-1, 0}, {0, 1}, {1, 0}, {0 -1}, {-1, 0} };
 
-    s.texCoordArray = seg.texCoordArray;
+    Point2f* texCoordArray = seg.texCoordArray;
 
-    s.vertexArray = new Point3f[ (seg.size+1) * (seg.size+1) ];
-    s.normalArray = new Point3f[ (seg.size+1) * (seg.size+1) ];
+    Point3f* vertexArray = new Point3f[ (seg.size+1) * (seg.size+1) ];
+    Point3f* normalArray = new Point3f[ (seg.size+1) * (seg.size+1) ];
 
     for ( int ix = 0; ix <= s.W; ix++ ){
         for ( int iy = 0; iy <= s.H; iy++ ){
-            s.vertexArray[ iy*(seg.size+1)+ix ].set( tileSize*(x+ix), tileSize*(y+iy), hmap[ (y+iy)*(W+1)+(x+ix) ] );
+            vertexArray[ iy*(seg.size+1)+ix ].set( tileSize*(x+ix), tileSize*(y+iy), hmap[ (y+iy)*(W+1)+(x+ix) ] );
             //~ log( TU, "v[%i, %i] => s.vertexArray[ %i ].set( %.2f, %.2f, %.2f )\n", ix, iy, iy*(seg.size+1)+ix, tileSize*(x+ix), tileSize*(y+iy), hmap[ (y+iy)*(W+1)+(x+ix) ] );
-            s.normalArray[ iy*(seg.size+1)+ix ].set( 0.0f, 0.0f, 0.0f );
+            normalArray[ iy*(seg.size+1)+ix ].set( 0.0f, 0.0f, 0.0f );
             Point3f p0( 0.0f, hmap[ (y+iy)*(W+1)+(x+ix) ], 0.0f ), p1, p2;
             for ( int i = 0; i < 4; i++ ){
                 p1.set( d[i][0], hmapGet( x+ix+d[i][0], y+iy+d[i][1] ), d[i][1] );
                 p2.set( d[i+1][0], hmapGet( x+ix+d[i+1][0], y+iy+d[i+1][1] ), d[i+1][1] );
-                getNormal2( p0, p2, p1, s.normalArray[ iy*(seg.size+1)+ix ] );
+                getNormal2( p0, p2, p1, normalArray[ iy*(seg.size+1)+ix ] );
             }
         }
     }
+    
+    s.createDisplayLists(vertexArray, normalArray, texCoordArray);
+
+    delete [] vertexArray;
+    delete [] normalArray;
 }
 
 void Terrain::makeSegments()
 {
-    indices = new uint16_t[ seg.size*2+2 ];
     seg.texCoordArray = new Point2f[ (seg.size+1) * (seg.size+1) ];
     for ( unsigned int ix = 0; ix <= seg.size; ix++ )
         for ( unsigned int iy = 0; iy <= seg.size; iy++ )
@@ -59,14 +63,11 @@ void Terrain::makeSegments()
     seg.segments = new TerrainSegment [seg.W*seg.H];
     LOG(("Terrain: %i segments created\n", seg.H*seg.W));
 
-    TerrainSegment::indices = indices;
-
     for ( int ix = 0; ix < seg.W; ix++ ){
         for ( int iy = 0; iy < seg.H; iy++ ){
             seg( ix, iy ).set( seg.size, ix == seg.W-1 ? wb : seg.size, iy == seg.H-1 ? hb : seg.size );
             seg( ix, iy ).tex = seg.map.find( std::make_pair( ix, iy ) ) == seg.map.end() ? texMap[ deftex ] : texMap[ seg.map[ std::make_pair( ix, iy ) ] ];
             make( seg( ix, iy ), ix*seg.size, iy*seg.size );
-            seg( ix, iy ).createDisplayLists(seg.texCoordArray);
         }
     }
 
@@ -139,6 +140,11 @@ void Terrain::tempDraw( const CamInfo& camInfo, const bool correctCamPos )
         for ( int iy = 0; iy < seg.H; iy++ ){
             seg( ix, iy ).tempDraw(camInfo);
         }
+
+    //~ for ( int ix = 0; ix < seg.W; ix++ )
+        //~ for ( int iy = 0; iy < seg.H; iy++ ){
+            //~ seg( ix, iy ).infoDraw(camInfo);
+        //~ }
 
     GLTERRORCHECK;
 

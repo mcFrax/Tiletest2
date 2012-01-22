@@ -1,6 +1,6 @@
 Wszystkie controlsy widoczne w konsoli po wciśnięciu 'h'. ( Tylko w wersji z GLUT )
 
-Pierwszy argument przekazany do programu jest traktowany jako nazwa mapy wysokości, drugi jako tekstura ( oba opcjonalne; domyślnie używa map.png i mapbitmap1024.png )
+Pierwszy argument przekazany do programu jest traktowany jako nazwa mapy MTT. Domyślnie testmap.mtt.
 
 Blokada obrotu kamery w dół wynika z niepełnej implementacji rysowania - zapobiega widoczności dziur w terenie
 

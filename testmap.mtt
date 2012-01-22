@@ -2,7 +2,7 @@ MTTtext 0.1
 
 #testowy plik MTTtext
 
-HeightMap "map.png"
+HeightMap "map128_2.png"
 
 segsize 16
 

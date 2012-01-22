@@ -1,14 +1,10 @@
 #ifndef _CONST_HPP_
 #define _CONST_HPP_
 
+extern const int WIDTH;
+extern const int HEIGHT;
+extern const float DIST;
 
-#define WIDTH  800
-#define HEIGHT 600
-#define DIST 45.0f
-
-const float PI = 3.14159f;
-
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+extern const float PI;
 
 #endif // _CONST_HPP_

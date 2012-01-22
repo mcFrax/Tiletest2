@@ -31,7 +31,7 @@ void glSetup()
 	glFogi( GL_FOG_MODE, GL_LINEAR );
 	//~ glFogi( GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH );
 	glFogf( GL_FOG_DENSITY, 0.1 );
-	glFogf( GL_FOG_START, DIST/5.0f );
+	glFogf( GL_FOG_START, DIST*0.8f );
 	glFogf( GL_FOG_END, DIST );
 	glEnable( GL_FOG );
 	

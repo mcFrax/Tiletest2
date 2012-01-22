@@ -1,16 +1,16 @@
 CXX = g++
-CXXFLAGS = -O3 -Wall
+CXXFLAGS = -O2 -Wall
 CFLAGS = $(CXXFLAGS) -I$(IDIR) -I$(IDIR2)
 LDFLAGS = -lSDL -lGL -lGLU -lm -lpng -lSDL_ttf -lSDL_image -L ../Tirian -lTirian
 OBJDIR = Obj/
 PROG = tiletest2
 IDIR = Include/
 IDIR2 = ../Tirian/Include/
-OBJ = $(OBJDIR)main.o $(OBJDIR)utils.o $(OBJDIR)texmap.o $(OBJDIR)terrain.o $(OBJDIR)bitmap.o $(OBJDIR)fakeistream.o $(OBJDIR)terrain_segment.o $(OBJDIR)mtt.o
+OBJ = $(OBJDIR)main.o $(OBJDIR)utils.o $(OBJDIR)texmap.o $(OBJDIR)terrain.o $(OBJDIR)bitmap.o $(OBJDIR)fakeistream.o $(OBJDIR)terrain_segment.o $(OBJDIR)mtt.o $(OBJDIR)const.o
 
 $(PROG): $(OBJ) /home/frax/Programowanie/Tirian/libTirian.a
 	$(CXX) $(OBJ) -o $(PROG) $(CFLAGS) $(LDFLAGS)
-	
+
 all: $(PROG)
 
 clean:
@@ -18,6 +18,9 @@ clean:
 
 $(OBJDIR)main.o:  main.cpp $(IDIR)main.hpp $(IDIR2)
 	$(CXX) -c main.cpp -o $(OBJDIR)main.o $(CFLAGS)
+
+$(OBJDIR)const.o:  const.cpp $(IDIR)const.hpp $(IDIR2)
+	$(CXX) -c const.cpp -o $(OBJDIR)const.o $(CFLAGS)
 	
 $(OBJDIR)utils.o:  utils.cpp $(IDIR)utils.hpp
 	$(CXX) -c utils.cpp -o $(OBJDIR)utils.o $(CFLAGS)

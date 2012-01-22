@@ -4,6 +4,8 @@
 #include <sstream>
 #include <cmath>
 
+#include <sys/times.h>
+
 static const long WINDOW_WIDTH = 800;
 static const long WINDOW_HEIGHT = 600;
 
@@ -12,6 +14,9 @@ static const char* WINDOW_TITLE_SHORT = WINDOW_TITLE;
 static const char* WINDOW_ICON = "icon.png";
 
 const static float mousefactor = 0.08f;
+
+static Label * fpsLabel;
+static Label * avgLabel;
 
 Scene::Scene( const std::string& name, Widget* new_parent, long left, long top, long width, long height, const char* mapPath, const CamInfo& camI )
 	:	Widget( name, new_parent, left, top, width, height ), terrain( mapPath ), cam( camI )
@@ -43,6 +48,13 @@ void Scene::onMotion( const MouseMotionEvent& e )
 
 void Scene::onDraw()
 {
+	static uint runs = 0;
+	static float avg = 0;
+	//~ static float favg = 0;
+	timespec res;
+	clock_getres(CLOCK_REALTIME, &res);
+	timespec tm1;
+	clock_gettime(CLOCK_REALTIME, &tm1);
 	Engine::Redraw();
 	//~ static const float bg[4] = { 70.0f/255.0f, 180.0f/255.0f, 200.0f/255.0f, 1.0f };
 	//~ 
@@ -63,12 +75,29 @@ void Scene::onDraw()
 	
 	terrain.tempDraw(cam);
 	
-	//~ glFinish();
-	
 	glDisable( GL_LIGHTING );
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_TEXTURE_2D );
 	glClear( GL_DEPTH_BUFFER_BIT);
+	timespec tm2;
+	clock_gettime(CLOCK_REALTIME, &tm2);
+    //~ glFinish();
+	//~ timespec tm3;
+	//~ clock_gettime(CLOCK_REALTIME, &tm3);
+	float ms1 = (tm2.tv_sec-tm1.tv_sec)*1000+(tm2.tv_nsec-tm1.tv_nsec)/1000000.0f;
+	//~ float ms2 = (tm3.tv_sec-tm2.tv_sec)*1000+(tm3.tv_nsec-tm2.tv_nsec)/1000000.0f;
+	avg = (avg*runs+ms1)/(runs+1);
+	//~ favg = (favg*runs+ms2)/(runs+1);
+	++runs;
+	if (runs>=20){
+		std::stringstream s;
+		s.precision(3);
+		s << std::fixed << "avg = " << avg << "ms";//"ms, favg = "<<favg<<"ms";
+		avgLabel -> setCaption(s.str());
+		runs = avg = 0;
+		//favg = 0;
+	}
+	
 }
 
 bool fullscreen = 0;
@@ -98,8 +127,6 @@ std::string fpsstring( Uint32 n )
 	os << n << " FPS";
 	return os.str();
 }
-
-static Label * fpsLabel;
 static std::list<Uint32> fps;
 void cbi( Widget * sender )
 {
@@ -130,10 +157,14 @@ int main( int argc, char* argv[] )
 		Scene * scn = new Scene( std::string("scn"), f, 0, 0, Engine::window().width(), Engine::window().height(), "testmap.mtt", cam );
 		scn -> anchors = 0xF;
 		
-		fpsLabel = new Label( std::string( "FPS Label" ), f, Engine::window().width()-70, 0, 70, 20, Engine::defFont, std::string() );
+		fpsLabel = new Label( std::string( "FPS Label" ), f, Engine::window().width()-100-20, 0, 100, 20, Engine::defFont, std::string() );
 		fpsLabel -> setEnabled( 0 );
 		fpsLabel -> anchors = Widget::anTop | Widget::anRight;
 		fpsLabel -> setHorTextPos( Label::hpRight );
+		avgLabel = new Label( std::string( "avg Label" ), f, Engine::window().width()-300-20, 20, 300, 20, Engine::defFont, std::string() );
+		avgLabel -> setEnabled( 0 );
+		avgLabel -> anchors = Widget::anTop | Widget::anRight;
+		avgLabel -> setHorTextPos( Label::hpRight );
 		
 		Engine::window().keyUpCallback = &cbk;
 		Engine::window().idleCallback = &cbi;
