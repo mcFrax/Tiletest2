@@ -6,7 +6,7 @@ OBJDIR = Obj/
 PROG = tiletest2
 IDIR = Include/
 IDIR2 = ../Tirian/Include/
-OBJ = $(OBJDIR)main.o $(OBJDIR)utils.o $(OBJDIR)texmap.o $(OBJDIR)terrain.o $(OBJDIR)bitmap.o $(OBJDIR)fakeistream.o
+OBJ = $(OBJDIR)main.o $(OBJDIR)utils.o $(OBJDIR)texmap.o $(OBJDIR)terrain.o $(OBJDIR)bitmap.o $(OBJDIR)fakeistream.o $(OBJDIR)terrain_segment.o $(OBJDIR)mtt.o
 
 $(PROG): $(OBJ) /home/frax/Programowanie/Tirian/libTirian.a
 	$(CXX) $(OBJ) -o $(PROG) $(CFLAGS) $(LDFLAGS)
@@ -24,6 +24,12 @@ $(OBJDIR)utils.o:  utils.cpp $(IDIR)utils.hpp
 	
 $(OBJDIR)texmap.o:  texmap.cpp $(IDIR)texmap.hpp
 	$(CXX) -c texmap.cpp -o $(OBJDIR)texmap.o $(CFLAGS)
+	
+$(OBJDIR)mtt.o:  mtt.cpp $(IDIR)mtt.hpp 
+	$(CXX) -c mtt.cpp -o $(OBJDIR)mtt.o $(CFLAGS)
+
+$(OBJDIR)terrain_segment.o:  terrain_segment.cpp $(IDIR)terrain_segment.hpp $(IDIR2)geometry.hpp 
+	$(CXX) -c terrain_segment.cpp -o $(OBJDIR)terrain_segment.o $(CFLAGS)
 	
 $(OBJDIR)terrain.o:  terrain.cpp $(IDIR)terrain.hpp $(IDIR2)geometry.hpp $(OBJDIR)texmap.o 
 	$(CXX) -c terrain.cpp -o $(OBJDIR)terrain.o $(CFLAGS)

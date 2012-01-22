@@ -11,14 +11,14 @@
 #include "const.hpp"
 #include "utils.hpp"
 #include "rendering.hpp"
-#include "terrain.hpp"
+#include "mtt.hpp"
 #include <widget.hpp>
 #include <engine.hpp>
 
 class Scene : public Widget
 {
 	private:
-		Terrain terrain;
+		MTTTerrain terrain;
 		CamInfo cam;
 		void onDraw();
 		void onMotion( const MouseMotionEvent& event );
