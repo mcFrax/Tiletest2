@@ -22,7 +22,7 @@ $(OBJDIR)main.o:  main.cpp $(IDIR)main.hpp $(IDIR2)
 $(OBJDIR)utils.o:  utils.cpp $(IDIR)utils.hpp
 	$(CXX) -c utils.cpp -o $(OBJDIR)utils.o $(CFLAGS)
 	
-$(OBJDIR)texmap.o:  texmap.cpp $(IDIR)texmap.hpp $(OBJDIR)texture.o
+$(OBJDIR)texmap.o:  texmap.cpp $(IDIR)texmap.hpp
 	$(CXX) -c texmap.cpp -o $(OBJDIR)texmap.o $(CFLAGS)
 	
 $(OBJDIR)terrain.o:  terrain.cpp $(IDIR)terrain.hpp $(IDIR2)geometry.hpp $(OBJDIR)texmap.o 
