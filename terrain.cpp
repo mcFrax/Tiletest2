@@ -51,6 +51,7 @@ void Terrain::rHmap( const char * path, int l, std::istream &is )
 		//~ throw std::runtime_error( "Could not read heightmap file" );
 		throw;
 	}
+    LOG(("MTT: Heightmap %ux%u loaded from \"%s\"\n", W, H, hmf.c_str()));
 	if ( seg.size != 0 ){
 		seg.W = ceil( static_cast<double>( W )/seg.size );
 		seg.H = ceil( static_cast<double>( H )/seg.size );
@@ -68,6 +69,7 @@ void Terrain::rSsize( const char * path, int l, std::istream &is )
 		fprintf( stderr, "%s:%i: Error: Segsize = 0\n", path, l );
 		throw std::runtime_error( std::string( "Segsize = 0" ) );
 	}
+    LOG(("MTT: Segsize %u\n", seg.size));
 	if ( hmap ){
 		seg.W = ceil( static_cast<double>( W )/seg.size );
 		seg.H = ceil( static_cast<double>( H )/seg.size );
@@ -94,6 +96,7 @@ void Terrain::rTex( const char * path, int l, std::istream &is )
 				fprintf( stderr, "%s:%i: Error: Unable to load texture #%u\n", path, l, id );
 				STDTHROW;
 			}
+            LOG(("MTT: Texture %u loaded from file \"%s\"\n", id, s.c_str()));
 			return;
 		}
 		if ( s[0] == 't' ){
@@ -105,6 +108,7 @@ void Terrain::rTex( const char * path, int l, std::istream &is )
 			int toffx, toffy, tw, th;
 			is >> toffx >> toffy >> tw >> th;
 			texMap.load( id, sid, toffx, toffy, tw, th );
+            LOG(("MTT: Texture %u created from %u texture\n", id, sid));
 			return;
 		}
 	}
@@ -125,6 +129,7 @@ void Terrain::rSeg( const char * path, int l, std::istream &is )
 	if ( !seg.map.insert( std::make_pair( std::make_pair( xo, yo ), id ) ).second ){
 		fprintf( stderr, "%s:%i: Warning: Segment [ %i, %i ] redefined\n", path, l, xo, yo );
 	}
+    LOG(("MTT: Segment [ %i, %i ] texture set to %i.\n", xo, yo, id));
 }
 
 void Terrain::rDeftex( const char * path, int l, std::istream &is )
@@ -136,6 +141,7 @@ void Terrain::rDeftex( const char * path, int l, std::istream &is )
 		texMap[ id ];
 		fprintf( stderr, "%s:%i: Warning: Deftex ( texture #%u ) has not been defined. Using empty texture\n", path, l, id );
 	}
+    LOG(("MTT: Deftex set to%u.\n", id));
 }
 
 void Terrain::checkMTTVersion( const char * path, std::istream& is, float min, float max )
@@ -160,6 +166,7 @@ void Terrain::checkMTTVersion( const char * path, std::istream& is, float min, f
 		throw std::runtime_error( std::string( "Too great MTT version" ) );
 	}
 	is.ignore( 1000000, '\n' );
+    LOG(("MTT: Loading MTT %f\n", v));
 }
 
 float Terrain::hmapGet( int x, int y )
@@ -208,9 +215,10 @@ void Terrain::makeSegments()
 			seg.texCoordArray[ iy*(seg.size+1) + ix ].set( 1.0f / seg.size * ix, 1.0f / seg.size * iy );
 	
 	int wb = W % seg.size == 0 ? seg.size : W % seg.size;	//szerokość brzegowych segmentów
-	int hb = W % seg.size == 0 ? seg.size : W % seg.size;	//wysokość brzegowych segmentów
+	int hb = H % seg.size == 0 ? seg.size : H % seg.size;	//wysokość brzegowych segmentów
 	
 	seg.segments = new Segment [seg.W*seg.H];
+    LOG(("Terrain: %i segments created\n", seg.H*seg.W));
 	
 	for ( int ix = 0; ix < seg.W; ix++ ){
 		for ( int iy = 0; iy < seg.H; iy++ ){
@@ -248,7 +256,6 @@ void Terrain::loadFromMTT( const char * path )
 	{
 	
 	//~ reset();
-	
 	std::map<std::string, Cenum> dict;
 	makedict( dict );
 	std::ifstream fin( path, std::ios::in );
@@ -336,9 +343,9 @@ void Terrain::loadFromMTT( const char * path )
 	if ( !texMap( deftex ) )
 		texMap[ deftex ];
 	
-	makeSegments();
+	LOG(( "MTT: Terrain loaded from MTT file \"%s\"\n", path ));
 	
-	LOG(( "Terrain loaded from MTT file \"%s\"\n", path ));
+	makeSegments();
 	
 	}
 	catch( std::exception &ex )
